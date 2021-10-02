@@ -39,7 +39,29 @@
         const date = document.getElementById('date');
         const content = document.getElementById('content');
         const request = new XMLHttpRequest();
-        console.log(window.location.protocol + '//' + window.location.hostname)
+        //${window.location.protocol}//${window.location.hostname}
+        const url = `https://vk-data-keep.herokuapp.com/data/all`
+        request.open('GET', url);
+        request.setRequestHeader('Content-Type', 'application/x-www-form-url');
+        request.setRequestHeader("Access-Control-Allow-Origin", "*");
+        request.setRequestHeader("Access-Control-Allow-Credentials", "true");
+        request.setRequestHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+        request.setRequestHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+        request.addEventListener("readystatechange", () => {
+            
+            /*   request.readyState - возвращает текущее состояние объекта XHR(XMLHttpRequest) объекта, 
+            бывает 4 состояния 4-е состояние запроса - операция полностью завершена, пришел ответ от сервера, 
+            вот то что нам нужно request.status это статус ответа, 
+            нам нужен код 200 это нормальный ответ сервера, 401 файл не найден, 500 сервер дал ошибку и прочее...   */
+            if (request.readyState === 4 && request.status === 200) {
+            
+                // выводим в консоль то что ответил сервер
+                console.log( request.responseText );
+            }
+        });
+    
+        // Выполняем запрос 
+        request.send();
     </script>
 </body>
 </html>
