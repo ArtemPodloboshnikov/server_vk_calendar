@@ -33,6 +33,6 @@ server.get('/data/:date', getData);
 server.get('/data/:date/:events', setData);
 // server.head('/set-data/:date', getData);
 
-server.listen(8080, function() {
+server.listen(process.env.PORT || 80, function() {
   console.log('%s listening at %s', server.name, server.url);
 });
