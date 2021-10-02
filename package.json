@@ -1,0 +1,19 @@
+{
+  "name": "vkbot",
+  "version": "1.0.0",
+  "description": "This bot for Voenmeh calendar",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "bot",
+    "vk"
+  ],
+  "author": "Artem Podloboshnikov",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "restify": "^8.6.0"
+  }
+}

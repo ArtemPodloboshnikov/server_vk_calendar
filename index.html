@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <style>
+        *{
+            box-sizing: border-box;
+        
+        }
+        .main
+        {
+            display: grid;
+            width: 70%;
+            height: fit-content;
+            margin: 0 auto;
+            margin-top: 10%;
+            background-color: red;
+            grid-auto-flow: row;
+            
+        }
+        .main > textarea
+        {
+            height: 30vh;
+            margin-top: 3%;
+            outline: none;
+            resize: none;
+        }
+    </style>
+    <div class="main">
+        <input type="date" id='date'>
+        <textarea id='content'></textarea>
+    </div>
+    <script>
+        const date = document.getElementById('date');
+        const content = document.getElementById('content');
+        const request = new XMLHttpRequest();
+        console.log(window.location.protocol + '//' + window.location.hostname)
+    </script>
+</body>
+</html>
