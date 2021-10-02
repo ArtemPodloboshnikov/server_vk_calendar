@@ -25,11 +25,21 @@ function setData(req, res, next) {
     }
     next();
   }
-
+function getPage(req, res, next) {
+  const page = fs.readFileSync('./index.html')
+  res.writeHead(200, {
+    'Content-Length': Buffer.byteLength(page),
+    'Content-Type': 'text/html'
+  });
+  res.write(page)
+  res.end();
+  next()
+}
 let server = restify.createServer();
 server.use(restify.plugins.queryParser());
 server.use(cors())
 server.get('/data/:date', getData);
+server.get('/index.html', getPage);
 server.get('/data/:date/:events', setData);
 // server.head('/set-data/:date', getData);
 
