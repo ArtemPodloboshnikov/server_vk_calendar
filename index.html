@@ -10,7 +10,7 @@
     <style>
         *{
             box-sizing: border-box;
-        
+            outline: none;
         }
         .main
         {
@@ -19,7 +19,6 @@
             height: fit-content;
             margin: 0 auto;
             margin-top: 10%;
-            background-color: red;
             grid-auto-flow: row;
             
         }
@@ -27,41 +26,90 @@
         {
             height: 30vh;
             margin-top: 3%;
-            outline: none;
             resize: none;
+        }
+        #list
+        {
+            display: grid;
+            grid-auto-flow: row;
+            width: 100%;
+            height: fit-content;
+            margin-top: 3%;
+        }
+        .list_item
+        {
+            border-bottom: 5px solid grey;
+        }
+        #send
+        {
+            width: 100%;
+            height: auto;
+            margin-top: 3%;
         }
     </style>
     <div class="main">
         <input type="date" id='date'>
-        <textarea id='content'></textarea>
+        <textarea placeholder="Напишите события, которые произойдут в указанную дату через '.'" id='content'></textarea>
+        <button id='send'>Отправить</button>
+        <div id="list"></div>
     </div>
     <script>
+        const list = document.getElementById('list');
         const date = document.getElementById('date');
         const content = document.getElementById('content');
-        const request = new XMLHttpRequest();
-        //${window.location.protocol}//${window.location.hostname}
-        const url = `https://vk-data-keep.herokuapp.com/data/all`
-        request.open('GET', url);
-        request.setRequestHeader('Content-Type', 'application/x-www-form-url');
-        request.setRequestHeader("Access-Control-Allow-Origin", "*");
-        request.setRequestHeader("Access-Control-Allow-Credentials", "true");
-        request.setRequestHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
-        request.setRequestHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
-        request.addEventListener("readystatechange", () => {
+        const send = document.getElementById('send');
+        
+        function sendRequest(url, method='get', body='')
+        {
+            const request = new XMLHttpRequest();
+            request.open(method, url, ((method == 'post')? true: false));
+            request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            request.setRequestHeader("Access-Control-Allow-Origin", "*");
+            request.setRequestHeader("Access-Control-Allow-Credentials", "true");
+            request.setRequestHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+            request.setRequestHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+            request.addEventListener("readystatechange", () => {
             
-            /*   request.readyState - возвращает текущее состояние объекта XHR(XMLHttpRequest) объекта, 
-            бывает 4 состояния 4-е состояние запроса - операция полностью завершена, пришел ответ от сервера, 
-            вот то что нам нужно request.status это статус ответа, 
-            нам нужен код 200 это нормальный ответ сервера, 401 файл не найден, 500 сервер дал ошибку и прочее...   */
-            if (request.readyState === 4 && request.status === 200) {
+                /*   request.readyState - возвращает текущее состояние объекта XHR(XMLHttpRequest) объекта, 
+                бывает 4 состояния 4-е состояние запроса - операция полностью завершена, пришел ответ от сервера, 
+                вот то что нам нужно request.status это статус ответа, 
+                нам нужен код 200 это нормальный ответ сервера, 401 файл не найден, 500 сервер дал ошибку и прочее...   */
+                if (request.readyState === 4 && request.status === 200) {
+                
+                    const response = JSON.parse(JSON.parse(request.responseText));
+                    console.log(response);
+                    for (let date in response)
+                    {
+                        const item = document.createElement('div')
+                        item.classList.add('list_item')
+                        item.textContent= date + ': ' + response[date].join('. ')
+        
+                        list.appendChild(item)
+                    }
+                }
+            });
+        
+            console.log(method, body)
             
-                // выводим в консоль то что ответил сервер
-                console.log( request.responseText );
+            if (method == 'post')
+            {
+                request.send(body)
+                sendRequest(`${window.location.protocol}//${window.location.hostname}:${window.location.port}/data/all`);
+
             }
-        });
-    
-        // Выполняем запрос 
-        request.send();
+            else
+            {
+                request.send();
+            }
+        }
+
+        sendRequest(`${window.location.protocol}//${window.location.hostname}:${window.location.port}/data/all`);
+
+        send.onclick = () => {
+            const str_date = date.value.split('-').reverse().join('.');
+            const body = content.value;
+            sendRequest(decodeURIComponent(`${window.location.protocol}//${window.location.hostname}:${window.location.port}/data/${str_date}`), 'post', body)
+        }
     </script>
 </body>
 </html>
