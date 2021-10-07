@@ -104,6 +104,6 @@ server.post('/data/:date', setData);
 server.del('/data/:date', deleteData);
 // server.head('/set-data/:date', getData);
 
-server.listen(process.env.PORT || 8080, function() {
+server.listen(process.env.PORT || 80, function() {
   console.log('%s listening at %s', server.name, server.url);
 });
