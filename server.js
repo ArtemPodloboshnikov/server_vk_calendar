@@ -15,7 +15,37 @@ function getData(req, res, next) {
   }
   next();
 }
+function deleteData(req, res, next)
+{
+  const fileContents = fs.readFileSync('./data.json', 'utf8');
+  let data = JSON.parse(fileContents);
+  let new_data = [];
+  for (let i = 0; i < data[req.params.date].length; i++)
+  {
+    const current_time = Object.keys(data[req.params.date][i])[0];
+    if (req.body.time !== current_time)
+    {
 
+      new_data.push({[current_time]: data[req.params.date][i][current_time]});
+      // delete data[req.params.date][i][req.body.time];
+      // break;
+    }
+  }
+  data[req.params.date] = new_data;
+  console.log(data);
+  new_data = {};
+  for (let date in data)
+  {
+    if (data[date].length != 0)
+      new_data[date] = [...data[date]]
+  }
+  data = new_data;
+  console.log(data)
+  fs.writeFileSync('./data.json', JSON.stringify(data))
+  res.send(JSON.stringify(data));
+
+  next();
+}
 function setData(req, res, next) {
     try {
 
@@ -71,8 +101,9 @@ server.get('/data/:date', getData);
 server.get('/index', getPage);
 server.put('/data/:date/:time', setData);
 server.post('/data/:date', setData);
+server.del('/data/:date', deleteData);
 // server.head('/set-data/:date', getData);
 
-server.listen(process.env.PORT || 80, function() {
+server.listen(process.env.PORT || 8080, function() {
   console.log('%s listening at %s', server.name, server.url);
 });

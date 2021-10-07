@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Document</title>
     <!-- <link rel="stylesheet" type="text/css" href='/styles/main.css'> -->
 </head>
 <body>
     <style>
-    *{
+    *
+    {
         box-sizing: border-box;
         outline: none;
         font-family: Arial, Helvetica, sans-serif;
@@ -21,6 +22,10 @@
     {
         background: linear-gradient(to right, var(--blue-color), var(--pink-color));
 
+    }
+    button
+    {
+        cursor: pointer;
     }
     input, button
     {
@@ -95,6 +100,10 @@
         text-align: center;
         color: var(--blue-color)
     }
+    .list_event
+    {
+        display: grid;
+    }
     .list_event > h2
     {
         font-family: 'Rubik One', sans-serif;
@@ -116,6 +125,7 @@
     .list_edit
     {
         display: grid;
+        width: 100%;
         grid-auto-flow: row;
         grid-template-columns: repeat(2, 1fr);
         column-gap: 3%;
@@ -125,6 +135,7 @@
     .list_edit > *
     {
         margin-top: 3%;
+        min-width: 100%;
     }
     #send
     {
@@ -197,7 +208,10 @@
                     const event_date = document.createElement('span');
                     event_date.classList.add('list_event');
                     const event_obj = Object.entries(event);
-                    event_date.innerHTML = `<h2>${event_obj[0][0]}</h2><h3 id='${date + '_' + event_obj[0][0]}' contenteditable='true' onblur='updateData(this)'>${event_obj[0][1]}</h3>`;
+                    event_date.innerHTML = `
+                    <h2>${event_obj[0][0]}</h2>
+                    <button id='${date + '_' + event_obj[0][0]}' onclick='deleteTimeEvent(this)' style='text-align: center; font-size: 2em;'>&#128465;</button>
+                    <h3 id='${date + '_' + event_obj[0][0]}' contenteditable='true' onblur='updateData(this)'>${event_obj[0][1]}</h3>`;
                     item.appendChild(event_date);
                     item.appendChild(document.createElement('br'))
 
@@ -209,15 +223,21 @@
         sendRequest(`${window.location.protocol}//${window.location.hostname}:${window.location.port}/data/all`);
 
         send.onclick = () => {
-            const date = document.getElementById('date');
+
+            let date = document.getElementById('date');
             const str_date = date.value.split('-').reverse().join('.');
             let body = {};
             body[str_date] = [];
+            date.value = null;
             for (let i = 0; document.getElementById('time_' + i) !== null; i++)
             {
                 let time_event = new Object();
-                time_event[document.getElementById('time_' + i).value] = document.getElementById('content_' + i).value;
+                let time_input = document.getElementById('time_' + i);
+                let content_input = document.getElementById('content_' + i);
+                time_event[time_input.value] = content_input.value;
                 body[str_date].push(time_event); 
+                time_input.value = null;
+                content_input.value = null;
             }
             console.log(body)
             sendRequest(`${window.location.protocol}//${window.location.hostname}:${window.location.port}/data/${str_date}`, 'post', body)
@@ -247,10 +267,16 @@
             const date = buf[0];
             const time = buf[1];
             const data = event.innerHTML;
-            let obj = {};
-            obj[time] = data
-            sendRequest(`${window.location.protocol}//${window.location.hostname}:${window.location.port}/data/${date}/${time}`, 'put', obj)
+            sendRequest(`${window.location.protocol}//${window.location.hostname}:${window.location.port}/data/${date}/${time}`, 'put', {[time]: data})
         }
+        function deleteTimeEvent(event)
+        {
+            const buf = event.id.split('_');
+            const date = buf[0];
+            const time = buf[1];
+            sendRequest(`${window.location.protocol}//${window.location.hostname}:${window.location.port}/data/${date}`, 'delete', {time: time})
+        }
+       
     </script>
 </body>
 </html>
