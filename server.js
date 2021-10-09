@@ -89,8 +89,17 @@ async function setData(req, res, next) {
       // console.log(req.body)
       if (req.params.time === undefined)
       {
-        // console.log(req.body)
-        data[req.params.date] = req.body[req.params.date];
+        if (data[req.params.date] !== undefined)
+        {
+          for (let event of req.body[req.params.date])
+          {
+            data[req.params.date].push({[Object.keys(event)[0]]: Object.values(event)[0]});
+          }
+        }
+        else
+        {
+          data[req.params.date] = req.body[req.params.date];
+        }
         // console.log(data)
       }
       else
