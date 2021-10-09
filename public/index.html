@@ -204,12 +204,16 @@
             console.log(url, options)
             const request = await fetch(url, options)
             let response = await request.json();
-            response = JSON.parse(response)
+            response = JSON.parse(response);
+            const dates = Object.keys(response).sort((a, b)=>
+            {
+                return new Date(a.split('.').reverse().join('-')) - new Date(b.split('.').reverse().join('-'));
+            })
             console.log(response);
             while (list.firstChild) {
                 list.removeChild(list.firstChild);
             }
-            for (let date in response)
+            for (let date of dates)
             {
                 const item = document.createElement('div')
                 item.classList.add('list_item')
@@ -221,7 +225,11 @@
                 
 
                 item.appendChild(title_date);
-
+                response[date].sort((a, b)=>{
+                    
+                    console.log(Object.keys(a), Object.keys(b))
+                    return Object.keys(a)[0].localeCompare(Object.keys(b)[0]);
+                });
                 for (let event of response[date])
                 {
                     const event_date = document.createElement('span');
