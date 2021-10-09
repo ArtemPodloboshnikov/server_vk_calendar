@@ -93,7 +93,8 @@ async function setData(req, res, next) {
         {
           for (let event of req.body[req.params.date])
           {
-            data[req.params.date].push({[Object.keys(event)[0]]: Object.values(event)[0]});
+            console.log(Object.keys(event), Object.values(event));
+            data[req.params.date].push({[Object.keys(event)[0]]: event[Object.keys(event)[0]]});
           }
         }
         else
@@ -110,8 +111,9 @@ async function setData(req, res, next) {
         {
           if (Object.keys(buf_data[i])[0] == req.params.time)
           {
-            buf_data[i] = {};
-            buf_data[i][req.params.time] = req.body[req.params.time]
+            console.log(buf_data[i][req.params.time])
+            // buf_data[i] = {};
+            buf_data[i][req.params.time][req.body.key] = req.body[req.params.time]
           }
         }
       }
