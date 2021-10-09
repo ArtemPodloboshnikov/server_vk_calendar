@@ -118,26 +118,19 @@ async function setData(req, res, next) {
     next();
   }
 
-function getPage(req, res, next) {
-  const page = fs.readFileSync('./index.html')
-  res.writeHead(200, {
-    'Content-Length': Buffer.byteLength(page),
-    'Content-Type': 'text/html'
-  });
-  res.write(page)
-  res.end();
-  next()
-}
 let server = restify.createServer();
 server.use(restify.plugins.queryParser());
 server.use(restify.plugins.bodyParser({ mapParams: true }));
 server.use(cors())
 server.get('/data/all', getData);
-server.get('/index', getPage);
+// server.get('/index', getPage);
 server.put('/data/:date/:time', setData);
 server.post('/data/:date', setData);
 server.del('/data/:date', deleteData);
-// server.head('/set-data/:date', getData);
+server.get('/index', restify.plugins.serveStatic({
+  directory: './public/',
+  file: 'index.html'
+}));
 
 server.listen(process.env.PORT || 80, function() {
   console.log('%s listening at %s', server.name, server.url);
