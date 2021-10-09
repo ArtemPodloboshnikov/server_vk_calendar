@@ -1,24 +1,55 @@
 let restify = require('restify');
 let cors = require('cors');
 const fs = require('fs');
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+const url_data = 'https://json.extendsclass.com/bin/67d94baa7657';
 
+async function updateQuery(data)
+{
+  try
+  {
 
-function getData(req, res, next) {
+    let response = await fetch(url_data, {
+      method: 'PUT',
+      headers:
+      {
+        'Content-Type': 'application/json',
+        "Security-key": '777'
+      },
+      body: JSON.stringify(data)
+    })
+    console.log(await response.json())
+  }
+  catch(error)
+  {
+    console.log(error)
+  }
+} 
+async function getQuery()
+{
   try {
-  
-    const fileContents = fs.readFileSync('./data.json', 'utf8');
-    const data = JSON.parse(fileContents)
-    res.send((req.params.date == 'all')?JSON.stringify(data):JSON.stringify(data[req.params.date]));
+    const data = await fetch(url_data);
+    // const fileContents = fs.readFileSync('./data.json', 'utf8');
+    // const data = JSON.parse(fileContents)
+    // res.send((req.params.date == 'all')?JSON.stringify(data):JSON.stringify(data[req.params.date]));
+    const json = await data.json();
+    return json;
    
   } catch(err) {
     console.error(err)
   }
+}
+async function getData(req, res, next) {
+  const data = await getQuery();
+  res.send(JSON.stringify(data))
   next();
 }
-function deleteData(req, res, next)
+async function deleteData(req, res, next)
 {
-  const fileContents = fs.readFileSync('./data.json', 'utf8');
-  let data = JSON.parse(fileContents);
+  // const fileContents = fs.readFileSync('./data.json', 'utf8');
+  // let data = JSON.parse(fileContents);
+  let data = await getQuery();
+
   let new_data = [];
   for (let i = 0; i < data[req.params.date].length; i++)
   {
@@ -41,18 +72,21 @@ function deleteData(req, res, next)
   }
   data = new_data;
   console.log(data)
-  fs.writeFileSync('./data.json', JSON.stringify(data))
+  updateQuery(data)
+  // fs.writeFileSync('./data.json', JSON.stringify(data))
   res.send(JSON.stringify(data));
 
   next();
 }
-function setData(req, res, next) {
+async function setData(req, res, next) {
     try {
 
-      const fileContents = fs.readFileSync('./data.json', 'utf8');
-      let data = JSON.parse(fileContents);
-      console.log(req.params)
-      console.log(req.body)
+      // const fileContents = fs.readFileSync('./data.json', 'utf8');
+      // let data = JSON.parse(fileContents);
+      const data = await getQuery();
+      console.log(data)
+      // console.log(req.params)
+      // console.log(req.body)
       if (req.params.time === undefined)
       {
         // console.log(req.body)
@@ -61,7 +95,7 @@ function setData(req, res, next) {
       }
       else
       {
-        console.log(data);
+        // console.log(data);
         let buf_data = data[req.params.date];
         for (let i = 0; i < buf_data.length; i++)
         {
@@ -73,7 +107,8 @@ function setData(req, res, next) {
         }
       }
 
-      fs.writeFileSync('./data.json', JSON.stringify(data))
+      // fs.writeFileSync('./data.json', JSON.stringify(data))
+      updateQuery(data);
       res.send(JSON.stringify(data));
 
     } catch(err) {
@@ -97,7 +132,7 @@ let server = restify.createServer();
 server.use(restify.plugins.queryParser());
 server.use(restify.plugins.bodyParser({ mapParams: true }));
 server.use(cors())
-server.get('/data/:date', getData);
+server.get('/data/all', getData);
 server.get('/index', getPage);
 server.put('/data/:date/:time', setData);
 server.post('/data/:date', setData);
